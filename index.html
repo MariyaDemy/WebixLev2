@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script
+      type="text/javascript"
+      src="http://cdn.webix.com/edge/webix.js"
+    ></script>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="http://cdn.webix.com/edge/webix.css"
+    />
+    <style type="text/css">
+        .blue .webix_button,
+        .blue .webix_button:hover
+        {
+            background-color: aqua;
+        }
+        .purple .webix_button{
+            background-color: rgb(128, 0, 255);
+        }
+        .orange .webix_button{
+            background-color: rgb(255, 98, 0);
+        }
+    </style>
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      let template = {
+        view: "template",
+        template: "Sort list:",
+        maxHeight: 50,
+      };
+
+      let list = {
+        view: "list",
+        id: "mylist",
+        maxWidth: 200,
+        url: "data.js",
+        template: "#id#. #title#, #year#, #rank#",
+        maxHeight: 500,
+      };
+
+      let button = {
+        view: "statesButton",
+        id: "mybtn",
+        states: { 0: "Off", 1: "SortAsc", 2: "Sort Desc" },
+        state: 0,
+        on: {
+          onStateChange: function (state) {
+              let list = $$("mylist");
+              if(state === 0) {
+                list.sort("#id#", "asc",);
+              } else if(state === "1"){
+                  list.sort("#id#", "asc",);
+              }
+                else {
+                    list.sort("#id#", "desc",)
+                };
+        
+                
+            }
+          },
+        };
+
+      webix.protoUI(
+        {
+          name: "statesButton",
+          $init: function (config) {
+            config.states = config.states || { 0: "Not defined" }; 
+
+            const stateHash = Object.entries(config.states);
+            let firstState = config.state || stateHash[0][0]; 
+
+            config.label = config.states[firstState];
+
+            webix.html.addCss(this.getNode(), "blue");
+
+            this.attachEvent("onItemClick", function () {
+                const stateHash = Object.entries(this.config.states);
+                let state = this.config.state;                
+                let index = stateHash.findIndex(el => el[0] == state);
+                debugger;
+                index += 1;
+                
+                if(index > stateHash.length - 1){
+                    index = 0;
+                };
+                
+                this.config.state = stateHash[index][0];
+                this.config.label = config.states[state];                
+                this.refresh();
+                this.callEvent("onStateChange", [state]);
+            });
+          },
+        },
+        webix.ui.button
+      );
+
+      webix.ui({
+        rows: [template, button, list],
+      });
+    </script>
+  </body>
+</html>
