@@ -15,27 +15,29 @@
       href="http://cdn.webix.com/edge/webix.css"
     />
     <style type="text/css">
-        .state0 .webix_button,
-        .state0 .webix_button:hover,
-        .state0 .webix_button:active,
-        .state0 .webix_button:focus
-        {
-            background-color: aqua;
-        }
-        .state1 .webix_button,
-        .state1 .webix_button:hover,
-        .state1 .webix_button:active,
-        .state1 .webix_button:focus {
-            background-color:gold;
-        }
-        .state2 .webix_button,
-        .state2 .webix_button:hover,
-        .state2 .webix_button:active,
-        .state2 .webix_button:focus {
-            background-color:chartreuse;
-        }
+      .state0 .webix_button,
+      .state0 .webix_button:hover,
+      .state0 .webix_button:active,
+      .state0 .webix_button:focus {
+        background-color: aqua;
+      }
+
+      .state1 .webix_button,
+      .state1 .webix_button:hover,
+      .state1 .webix_button:active,
+      .state1 .webix_button:focus {
+        background-color: gold;
+      }
+
+      .state2 .webix_button,
+      .state2 .webix_button:hover,
+      .state2 .webix_button:active,
+      .state2 .webix_button:focus {
+        background-color: chartreuse;
+      }
     </style>
   </head>
+
   <body>
     <script type="text/javascript" charset="utf-8">
       let template = {
@@ -56,58 +58,123 @@
       let button = {
         view: "statesButton",
         id: "mybtn",
-        states: { 0: "Off", 1: "SortAsc", 2: "Sort Desc" },
+        states: {
+          0: "Off",
+          1: "SortAsc",
+          2: "Sort Desc",
+        },
         state: 0,
         on: {
           onStateChange: function (state) {
-              let list = $$("mylist");
-              if(state === 0 || state === "0") {
-                list.sort("#id#", "asc",);
-              } else if(state === 1 || state === "1"){
-                  list.sort("#id#", "asc",);
-              }
-                else {
-                    list.sort("#id#", "desc",)
-                };               
+            let list = $$("mylist");
+            if (state === 0 || state === "0") {
+              list.sort("#id#", "asc");
+            } else if (state === 1 || state === "1") {
+              list.sort("#id#", "asc");
+            } else {
+              list.sort("#id#", "desc");
             }
           },
-        };
+        },
+      };
+
+      let form = {
+        view: "formControl",
+        id: "myform",
+        fields: ["one", "two", "three", "four"],
+        saveAction: function () {
+          console.log("User's function");
+        },
+      };
 
       webix.protoUI(
         {
           name: "statesButton",
           $init: function (config) {
-            config.states = config.states || { 0: "Not defined" }; 
+            config.states = config.states || {
+              0: "Not defined",
+            };
 
             const stateHash = Object.entries(config.states);
-            let firstState = config.state || stateHash[0][0]; 
+            let firstState = config.state || stateHash[0][0];
 
             config.label = config.states[firstState];
 
-            let index = stateHash.findIndex(el => el[0] == config.state);
-            webix.html.addCss(this.getNode(), "state"+index); 
+            let index = stateHash.findIndex((el) => el[0] == config.state);
+            webix.html.addCss(this.getNode(), "state" + index);
             this.attachEvent("onItemClick", function () {
-                let state = this.config.state;   
-                webix.html.removeCss(this.getNode(), "state"+index);              
-                index += 1;               
-                if(index > stateHash.length - 1){
-                    index = 0;
-                }; 
-                webix.html.addCss(this.getNode(), "state"+index);               
-                this.config.state = stateHash[index][0];
-                this.config.label = config.states[this.config.state];  
-                            
-                this.refresh();
-                this.callEvent("onStateChange", [state]);
+              let state = this.config.state;
+              webix.html.removeCss(this.getNode(), "state" + index);
+              index += 1;
+              if (index > stateHash.length - 1) {
+                index = 0;
+              }
+              webix.html.addCss(this.getNode(), "state" + index);
+              this.config.state = stateHash[index][0];
+              this.config.label = config.states[this.config.state];
+
+              this.refresh();
+              this.callEvent("onStateChange", [state]);
             });
-            console.log(this.config)
           },
         },
         webix.ui.button
       );
 
+      webix.protoUI(
+        {
+          name: "formControl",
+          defaults: {
+            saveAction: function () {
+              const values = this.getFormView().getValues();
+            },
+            cancelAction: function () {
+              this.getFormView().clear();
+            },
+          },
+          $init: function (config) {
+            config.fields = config.fields || ["Not defined"];
+            config.elements = [
+              {
+                margin: 15,
+                cols: [
+                  {
+                    view: "button",
+                    value: "Cancel",
+                    maxWidth: 200,
+                    click: config.cancelAction
+                      ? config.cancelAction
+                      : this.defaults["cancelAction"],
+                  },
+                  {
+                    view: "button",
+                    value: "Save",
+                    css: "webix_primary",
+                    maxWidth: 200,
+                    click: config.saveAction
+                      ? config.saveAction
+                      : this.defaults["saveAction"],
+                  },
+                ],
+              },
+            ];
+            let elems = [];
+            for (i = 0; i < config.fields.length; i++) {
+              let elem = {
+                view: "text",
+              };
+              elem.label = config.fields[i];
+              elem.name = config.fields[i];
+              elems.push(elem);
+            }
+            config.elements.splice(0, 0, ...elems);
+          },
+        },
+        webix.ui.form
+      );
+
       webix.ui({
-        rows: [template, button, list],
+        rows: [template, button, list, {}, form],
       });
     </script>
   </body>
